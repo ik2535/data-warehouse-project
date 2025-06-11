@@ -1,19 +1,34 @@
+/*
+=============================================================
+Create Healthcare Data Warehouse Database and Schemas
+=============================================================
+Script Purpose:
+    This script creates a new database named 'HealthcareAnalytics' after checking if it already exists. 
+    If the database exists, it is dropped and recreated. Additionally, the script sets up three schemas 
+    within the database: 'bronze', 'silver', and 'gold'.
+	
+WARNING:
+    Running this script will drop the entire 'HealthcareAnalytics' database if it exists. 
+    All data in the database will be permanently deleted. Proceed with caution 
+    and ensure you have proper backups before running this script.
+*/
+
 USE master;
 GO
 
--- Drop and recreate the 'DataWarehouse' database
-IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'DataWarehouse')
+-- Drop and recreate the 'HealthcareAnalytics' database
+IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'HealthcareAnalytics')
 BEGIN
-    ALTER DATABASE DataWarehouse SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE DataWarehouse;
+    ALTER DATABASE HealthcareAnalytics SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE HealthcareAnalytics;
 END;
 GO
 
--- Create the 'DataWarehouse' database
-CREATE DATABASE DataWarehouse;
+-- Create the 'HealthcareAnalytics' database
+CREATE DATABASE HealthcareAnalytics;
 GO
 
-USE DataWarehouse;
+USE HealthcareAnalytics;
 GO
 
 -- Create Schemas
@@ -25,3 +40,5 @@ GO
 
 CREATE SCHEMA gold;
 GO
+
+PRINT 'Healthcare Analytics Database and Schemas created successfully!';
