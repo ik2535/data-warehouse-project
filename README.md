@@ -1,18 +1,39 @@
 # Healthcare Data Warehouse Project
 
-This project builds a healthcare data warehouse using SQL Server with a three-layer architecture (Bronze, Silver, Gold) to analyze patient data and treatment outcomes.
+This project builds a healthcare data warehouse using SQL Server with a three-layer medallion architecture (Bronze, Silver, Gold) to analyze patient data and treatment outcomes.
 
 ## Project Overview
 
 The goal is to create a data warehouse that combines patient information from different healthcare systems (EHR and HMS) and provides clean, organized data for healthcare analytics and reporting.
 
-## Architecture
+## 🏗️ Data Architecture
 
-The project uses a medallion architecture with three layers:
+The data architecture follows the Medallion Architecture with **Bronze**, **Silver**, and **Gold** layers:
 
-- **Bronze Layer**: Raw data as-is from source systems
-- **Silver Layer**: Cleaned and validated data  
-- **Gold Layer**: Business-ready data organized for analytics
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   DATA SOURCES  │    │  BRONZE LAYER   │    │  SILVER LAYER   │    │   GOLD LAYER    │
+│                 │    │   (Raw Data)    │    │ (Cleaned Data)  │    │ (Analytics)     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  EHR SYSTEM     │───▶│ bronze.ehr_*    │───▶│ silver.ehr_*    │───▶│ gold.dim_*      │
+│ • Patient Info  │    │ (6 raw tables)  │    │ (cleaned data)  │    │ (2 dimensions)  │
+│ • Treatments    │    │                 │    │                 │    │                 │
+│ • Medical Records│    │                 │    │                 │    │ gold.fact_*     │
+└─────────────────┘    │                 │    │                 │    │ (1 fact table)  │
+                       │                 │    │                 │    │                 │
+┌─────────────────┐    │                 │    │                 │    │                 │
+│  HMS SYSTEM     │───▶│                 │    │                 │    │                 │
+│ • Demographics  │    │                 │    │                 │    │                 │
+│ • Locations     │    │                 │    │                 │    │                 │
+│ • Categories    │    │                 │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+1. **Bronze Layer**: Stores raw healthcare data as-is from source systems. Data ingested from CSV Files into SQL Server Database.
+2. **Silver Layer**: Includes data cleansing, validation, and standardization processes to prepare healthcare data for analysis.
+3. **Gold Layer**: Contains business-ready data modeled into a star schema for healthcare reporting and analytics.
 
 ## Data Sources
 
