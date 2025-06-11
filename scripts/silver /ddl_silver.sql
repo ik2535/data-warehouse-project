@@ -1,97 +1,115 @@
 /*
 ===============================================================================
-DDL Script: Create Silver Tables
+DDL Script: Create Silver Healthcare Tables
 ===============================================================================
 Script Purpose:
-    This script creates tables in the 'silver' schema, dropping existing tables 
-    if they already exist.
-	  Run this script to re-define the DDL structure of 'bronze' Tables
+    This script creates tables in the 'silver' schema for cleaned and validated
+    healthcare data, dropping existing tables if they already exist.
+    Run this script to define the DDL structure of silver healthcare tables.
 ===============================================================================
 */
 
-IF OBJECT_ID('silver.crm_cust_info', 'U') IS NOT NULL
-    DROP TABLE silver.crm_cust_info;
+-- Silver Patient Information
+IF OBJECT_ID('silver.ehr_patient_info', 'U') IS NOT NULL
+    DROP TABLE silver.ehr_patient_info;
 GO
 
-CREATE TABLE silver.crm_cust_info (
-    cst_id             INT,
-    cst_key            NVARCHAR(50),
-    cst_firstname      NVARCHAR(50),
-    cst_lastname       NVARCHAR(50),
-    cst_marital_status NVARCHAR(50),
-    cst_gndr           NVARCHAR(50),
-    cst_create_date    DATE,
-    dwh_create_date    DATETIME2 DEFAULT GETDATE()
+CREATE TABLE silver.ehr_patient_info (
+    patient_id          INT,
+    patient_mrn         NVARCHAR(50),
+    first_name          NVARCHAR(50),
+    last_name           NVARCHAR(50),
+    date_of_birth       DATE,
+    gender              NVARCHAR(10),
+    marital_status      NVARCHAR(20),
+    registration_date   DATE,
+    insurance_provider  NVARCHAR(100),
+    dwh_create_date     DATETIME2 DEFAULT GETDATE(),
+    dwh_update_date     DATETIME2 DEFAULT GETDATE()
 );
 GO
 
-IF OBJECT_ID('silver.crm_prd_info', 'U') IS NOT NULL
-    DROP TABLE silver.crm_prd_info;
+-- Silver Treatment Information
+IF OBJECT_ID('silver.ehr_treatment_info', 'U') IS NOT NULL
+    DROP TABLE silver.ehr_treatment_info;
 GO
 
-CREATE TABLE silver.crm_prd_info (
-    prd_id          INT,
-    cat_id          NVARCHAR(50),
-    prd_key         NVARCHAR(50),
-    prd_nm          NVARCHAR(50),
-    prd_cost        INT,
-    prd_line        NVARCHAR(50),
-    prd_start_dt    DATE,
-    prd_end_dt      DATE,
-    dwh_create_date DATETIME2 DEFAULT GETDATE()
+CREATE TABLE silver.ehr_treatment_info (
+    treatment_id        INT,
+    category_code       NVARCHAR(50),
+    treatment_code      NVARCHAR(50),
+    treatment_name      NVARCHAR(100),
+    cost_estimate       DECIMAL(10,2),
+    department          NVARCHAR(50),
+    effective_date      DATE,
+    discontinued_date   DATE,
+    dwh_create_date     DATETIME2 DEFAULT GETDATE(),
+    dwh_update_date     DATETIME2 DEFAULT GETDATE()
 );
 GO
 
-IF OBJECT_ID('silver.crm_sales_details', 'U') IS NOT NULL
-    DROP TABLE silver.crm_sales_details;
+-- Silver Medical Records
+IF OBJECT_ID('silver.ehr_medical_records', 'U') IS NOT NULL
+    DROP TABLE silver.ehr_medical_records;
 GO
 
-CREATE TABLE silver.crm_sales_details (
-    sls_ord_num     NVARCHAR(50),
-    sls_prd_key     NVARCHAR(50),
-    sls_cust_id     INT,
-    sls_order_dt    DATE,
-    sls_ship_dt     DATE,
-    sls_due_dt      DATE,
-    sls_sales       INT,
-    sls_quantity    INT,
-    sls_price       INT,
-    dwh_create_date DATETIME2 DEFAULT GETDATE()
+CREATE TABLE silver.ehr_medical_records (
+    record_id           NVARCHAR(50),
+    treatment_code      NVARCHAR(50),
+    patient_id          INT,
+    admission_date      DATE,
+    discharge_date      DATE,
+    followup_date       DATE,
+    total_cost          DECIMAL(10,2),
+    duration_days       INT,
+    outcome_score       INT,
+    dwh_create_date     DATETIME2 DEFAULT GETDATE(),
+    dwh_update_date     DATETIME2 DEFAULT GETDATE()
 );
 GO
 
-IF OBJECT_ID('silver.erp_loc_a101', 'U') IS NOT NULL
-    DROP TABLE silver.erp_loc_a101;
+-- Silver Hospital Location Data
+IF OBJECT_ID('silver.hms_location_data', 'U') IS NOT NULL
+    DROP TABLE silver.hms_location_data;
 GO
 
-CREATE TABLE silver.erp_loc_a101 (
-    cid             NVARCHAR(50),
-    cntry           NVARCHAR(50),
-    dwh_create_date DATETIME2 DEFAULT GETDATE()
+CREATE TABLE silver.hms_location_data (
+    patient_mrn         NVARCHAR(50),
+    region              NVARCHAR(50),
+    city                NVARCHAR(50),
+    dwh_create_date     DATETIME2 DEFAULT GETDATE(),
+    dwh_update_date     DATETIME2 DEFAULT GETDATE()
 );
 GO
 
-IF OBJECT_ID('silver.erp_cust_az12', 'U') IS NOT NULL
-    DROP TABLE silver.erp_cust_az12;
+-- Silver Patient Demographics
+IF OBJECT_ID('silver.hms_patient_demographics', 'U') IS NOT NULL
+    DROP TABLE silver.hms_patient_demographics;
 GO
 
-CREATE TABLE silver.erp_cust_az12 (
-    cid             NVARCHAR(50),
-    bdate           DATE,
-    gen             NVARCHAR(50),
-    dwh_create_date DATETIME2 DEFAULT GETDATE()
+CREATE TABLE silver.hms_patient_demographics (
+    patient_mrn         NVARCHAR(50),
+    birth_date          DATE,
+    gender_code         NVARCHAR(10),
+    emergency_contact   NVARCHAR(100),
+    dwh_create_date     DATETIME2 DEFAULT GETDATE(),
+    dwh_update_date     DATETIME2 DEFAULT GETDATE()
 );
 GO
 
-IF OBJECT_ID('silver.erp_px_cat_g1v2', 'U') IS NOT NULL
-    DROP TABLE silver.erp_px_cat_g1v2;
+-- Silver Treatment Categories
+IF OBJECT_ID('silver.hms_treatment_categories', 'U') IS NOT NULL
+    DROP TABLE silver.hms_treatment_categories;
 GO
 
-CREATE TABLE silver.erp_px_cat_g1v2 (
-    id              NVARCHAR(50),
-    cat             NVARCHAR(50),
-    subcat          NVARCHAR(50),
-    maintenance     NVARCHAR(50),
-    dwh_create_date DATETIME2 DEFAULT GETDATE()
+CREATE TABLE silver.hms_treatment_categories (
+    treatment_code      NVARCHAR(50),
+    category            NVARCHAR(50),
+    subcategory         NVARCHAR(50),
+    requires_followup   NVARCHAR(10),
+    dwh_create_date     DATETIME2 DEFAULT GETDATE(),
+    dwh_update_date     DATETIME2 DEFAULT GETDATE()
 );
 GO
+
+PRINT 'Silver healthcare tables created successfully!';
